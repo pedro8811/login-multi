@@ -1,0 +1,27 @@
+:root{
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-text-size-adjust: 100%;
+  line-height: 1.5;
+  font-weight: 400;
+  font-family: 'Montserrat';
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+}
+
+#root{
+  max-width: 1280px;
+  margin: 0;
+  text-align: center;
+}
+
+body{
+  margin: 0;
+  background: #fff;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+}
