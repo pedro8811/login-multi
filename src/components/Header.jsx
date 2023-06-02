@@ -35,7 +35,9 @@ const Logo = styled.img`
 const Header = () => {
   return (
     <ContainerHeader>
+      <a href="/home">
       <Logo src={logo}/>
+      </a>
       <Menu>
         <li><a>Início</a></li>
         <li><a>Locação</a></li>

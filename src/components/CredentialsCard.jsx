@@ -3,6 +3,8 @@ import { Input } from 'antd';
 import { AiOutlineUser, AiOutlineLock } from 'react-icons/ai';
 import { useState } from 'react';
 import logo from '../assets/logo.webp';
+import axios from 'axios';
+
 
 const Card = styled.div`
   width: 400px;
@@ -14,6 +16,7 @@ const Card = styled.div`
   font-family: 'Montserrat';
   border-radius: 10px;
   display: flex;
+  text-align: center;
   flex-direction: column;
   img{
     margin: auto;
@@ -77,6 +80,14 @@ const CredentialsCard = () => {
   const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
 
+  const data = {
+    user: login,
+    pwd: password,
+    interno: 'sim',
+  };
+
+  const url = 'https://www.multi.com.br/app/login.php'
+
   const handleEmailChange = (event) => {
     setLogin(event.target.value);
   };
@@ -85,13 +96,21 @@ const CredentialsCard = () => {
     setPassword(event.target.value);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    //lógica de autenticação
     
-    setLogin('')
-    setPassword('')
+
+    // try {
+    //   const response = await axios.post(url, {
+    //     login,
+    //     password,
+    //   });
+    //   const { token } = response.data;
+    //   localStorage.setItem('token', token);
+    // } catch (error) {
+    //   console.error(error);
+    // }
   }
 
   return (
@@ -99,7 +118,7 @@ const CredentialsCard = () => {
       <img src={logo} alt="" />
       <h3>Seja bem-vindo!</h3>
       <form onSubmit={handleSubmit}>
-        <Input addonAfter={<AiOutlineUser fontSize={'20px'} />} placeholder="Digite o CPF ou CNPJ" type="number" value={login} onChange={handleEmailChange} />
+        <Input addonAfter={<AiOutlineUser fontSize={'20px'} />} placeholder="Digite o CPF ou CNPJ" value={login} onChange={handleEmailChange} />
         <Input addonAfter={<AiOutlineLock fontSize={'20px'} />} placeholder="Digite sua senha" type="password" value={password} onChange={handlePasswordChange} />
         <Button type="primary">Entrar</Button>
       </form>
