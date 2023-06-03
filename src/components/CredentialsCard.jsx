@@ -3,6 +3,8 @@ import { Input } from 'antd';
 import { AiOutlineUser, AiOutlineLock } from 'react-icons/ai';
 import { useState } from 'react';
 import logo from '../assets/logo.webp';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const Card = styled.div`
   width: 400px;
@@ -77,6 +79,14 @@ const CredentialsCard = () => {
   const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
 
+  const navigate = useNavigate();
+  const url = 'https://www.multi.com.br/app/login.php?';
+  const data = {
+    user: login,
+    pwd: password,
+    interno: true,
+  }
+
   const handleEmailChange = (event) => {
     setLogin(event.target.value);
   };
@@ -85,21 +95,33 @@ const CredentialsCard = () => {
     setPassword(event.target.value);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    //lógica de autenticação
-    
-    setLogin('')
-    setPassword('')
-  }
+    try {
+      const response = await axios.post(
+        url,
+        data,
+        { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+      );
+
+      console.log(response.data); // Tratar a resposta da requisição
+
+      if (response.data.success) {
+        navigate('/home'); // Redirecionar para a nova rota
+      }
+
+    } catch (error) {
+      console.error('Erros: ' + error); // Tratar o erro ocorrido na requisição
+    }
+  };
 
   return (
     <Card>
       <img src={logo} alt="" />
       <h3>Seja bem-vindo!</h3>
       <form onSubmit={handleSubmit}>
-        <Input addonAfter={<AiOutlineUser fontSize={'20px'} />} placeholder="Digite o CPF ou CNPJ" type="number" value={login} onChange={handleEmailChange} />
+        <Input addonAfter={<AiOutlineUser fontSize={'20px'} />} placeholder="Digite o seu login" value={login} onChange={handleEmailChange} />
         <Input addonAfter={<AiOutlineLock fontSize={'20px'} />} placeholder="Digite sua senha" type="password" value={password} onChange={handlePasswordChange} />
         <Button type="primary">Entrar</Button>
       </form>
