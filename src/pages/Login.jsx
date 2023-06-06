@@ -1,5 +1,6 @@
 import CredentialsCard from '../components/CredentialsCard'
 import styled from 'styled-components'
+import { useState } from 'react'
 
 const Container = styled.div`
   width: 100vw;
@@ -8,14 +9,14 @@ const Container = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  /* background: rgb(230, 255, 230); */
-  background: url(../src/assets/smooth-white-plaster-wall.jpg);
+  background-image: url("https://www.multi.com.br/pedro/images/smooth-white-plaster-wall.webp");
   background-repeat: no-repeat;
   background-size: cover;
-
 `
 
 function Login() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  
   return (
     <Container>
       <CredentialsCard />

@@ -1,10 +1,11 @@
 import styled from 'styled-components';
 import { Input } from 'antd';
 import { AiOutlineUser, AiOutlineLock } from 'react-icons/ai';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import logo from '../assets/logo.webp';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { AuthContext } from '../context/AuthContext'
 
 const Card = styled.div`
   width: 400px;
@@ -16,6 +17,7 @@ const Card = styled.div`
   font-family: 'Montserrat';
   border-radius: 10px;
   display: flex;
+  text-align: center;
   flex-direction: column;
   img{
     margin: auto;
@@ -75,9 +77,17 @@ const Button = styled.button`
   }
 `
 
+const Message = styled.p`
+  margin: 0;
+  color: red;
+  font-size: 15px;
+`
+
 const CredentialsCard = () => {
   const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
+  const { setIsAuthenticated, isAuthenticated } = useContext(AuthContext);
+  const [loginFailed, setLoginFailed] = useState(false);
 
   const navigate = useNavigate();
   const url = 'https://www.multi.com.br/app/login.php?';
@@ -105,14 +115,17 @@ const CredentialsCard = () => {
         { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
       );
 
-      console.log(response.data); // Tratar a resposta da requisição
+      console.log(response.data);
 
-      if (response.data.success) {
-        navigate('/home'); // Redirecionar para a nova rota
+      if (response.data.success == 'true') {
+        setIsAuthenticated(true);
+        navigate('/pedro/home');
+      } else {
+        setIsAuthenticated(false);
+        setLoginFailed(true);
       }
-
     } catch (error) {
-      console.error('Erros: ' + error); // Tratar o erro ocorrido na requisição
+      console.error('Erros: ' + error);
     }
   };
 
@@ -123,6 +136,7 @@ const CredentialsCard = () => {
       <form onSubmit={handleSubmit}>
         <Input addonAfter={<AiOutlineUser fontSize={'20px'} />} placeholder="Digite o seu login" value={login} onChange={handleEmailChange} />
         <Input addonAfter={<AiOutlineLock fontSize={'20px'} />} placeholder="Digite sua senha" type="password" value={password} onChange={handlePasswordChange} />
+        <Message>{loginFailed && !isAuthenticated ? 'Login falhou!' : ''}</Message>
         <Button type="primary">Entrar</Button>
       </form>
       <a className="esqueci-senha">Esqueci minha senha</a>
