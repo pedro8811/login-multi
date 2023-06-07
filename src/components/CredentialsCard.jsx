@@ -129,6 +129,10 @@ const CredentialsCard = () => {
     }
   };
 
+  // const handleLogout = () => {
+
+  // }
+
   return (
     <Card>
       <img src={logo} alt="" />

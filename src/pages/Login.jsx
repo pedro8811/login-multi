@@ -1,6 +1,5 @@
 import CredentialsCard from '../components/CredentialsCard'
 import styled from 'styled-components'
-import { useState } from 'react'
 
 const Container = styled.div`
   width: 100vw;
@@ -15,8 +14,6 @@ const Container = styled.div`
 `
 
 function Login() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  
   return (
     <Container>
       <CredentialsCard />

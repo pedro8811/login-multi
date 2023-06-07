@@ -27,7 +27,7 @@ const Container = styled.div`
   }
 `
 
-export const Error = () => {
+const Error = () => {
   return (
     <Container>
       <h1>Error 404</h1>
@@ -36,3 +36,5 @@ export const Error = () => {
     </Container>
   )  
 }
+
+export default Error;
