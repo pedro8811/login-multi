@@ -1,7 +1,7 @@
 import styled from 'styled-components';
 import { Input } from 'antd';
 import { AiOutlineUser, AiOutlineLock } from 'react-icons/ai';
-import { useContext, useState } from 'react';
+import { useContext, useState, useEffect } from 'react';
 import logo from '../assets/logo.webp';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -79,23 +79,38 @@ const Button = styled.button`
 
 const Message = styled.p`
   margin: 0;
+  margin-top: 5px;
+  margin-bottom: 5px;
   color: red;
   font-size: 15px;
 `
 
 const CredentialsCard = () => {
+  const { setIsAuthenticated, isAuthenticated } = useContext(AuthContext);
+
   const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
-  const { setIsAuthenticated, isAuthenticated } = useContext(AuthContext);
+
   const [loginFailed, setLoginFailed] = useState(false);
+  const [message, setMessage] = useState('');
+  const [isVisible, setIsVisible] = useState(true);
 
   const navigate = useNavigate();
+
   const url = 'https://www.multi.com.br/app/login.php?';
   const data = {
     user: login,
     pwd: password,
     interno: true,
   }
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsVisible(false);
+    }, 4000);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleEmailChange = (event) => {
     setLogin(event.target.value);
@@ -108,6 +123,13 @@ const CredentialsCard = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (data.login == undefined) {
+      setMessage('Por favor, insira o seu login')
+    }
+    if (data.pwd == undefined) {
+      setMessage('Por favor, insira a sua senha')
+    }
+
     try {
       const response = await axios.post(
         url,
@@ -117,7 +139,7 @@ const CredentialsCard = () => {
 
       console.log(response.data);
 
-      if (response.data.success == 'true') {
+      if (response.data.success == 'true' && response.data.nome != "") {
         setIsAuthenticated(true);
         navigate('/pedro/home');
       } else {
@@ -129,10 +151,6 @@ const CredentialsCard = () => {
     }
   };
 
-  // const handleLogout = () => {
-
-  // }
-
   return (
     <Card>
       <img src={logo} alt="" />
@@ -140,7 +158,8 @@ const CredentialsCard = () => {
       <form onSubmit={handleSubmit}>
         <Input addonAfter={<AiOutlineUser fontSize={'20px'} />} placeholder="Digite o seu login" value={login} onChange={handleEmailChange} />
         <Input addonAfter={<AiOutlineLock fontSize={'20px'} />} placeholder="Digite sua senha" type="password" value={password} onChange={handlePasswordChange} />
-        <Message>{loginFailed && !isAuthenticated ? 'Login falhou!' : ''}</Message>
+        <Message>{isVisible && loginFailed && !isAuthenticated ? 'Login falhou!' : ''}</Message>
+        <Message>{isVisible && message}</Message>
         <Button type="primary">Entrar</Button>
       </form>
       <a className="esqueci-senha">Esqueci minha senha</a>
