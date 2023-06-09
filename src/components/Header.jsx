@@ -1,5 +1,10 @@
 import styled from 'styled-components'
 import logo from '../assets/logo.webp';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import { useState } from 'react';
+import Button from '@mui/material/Button';
+import { useNavigate } from 'react-router-dom';
 
 const ContainerHeader = styled.nav`
   display: flex;
@@ -9,11 +14,12 @@ const ContainerHeader = styled.nav`
   justify-content: space-between;
 `
 
-const Menu = styled.ul`
+const NavLinks = styled.ul`
   padding: 30px;
   list-style-type: none;
   display: flex;
   margin: 0;
+  align-items: center;
   li{
     a{
       color: #000;
@@ -25,6 +31,14 @@ const Menu = styled.ul`
       }
     }
   }
+  #basic-button{
+    font-family: 'Montserrat', sans-serif;
+    color: #000;
+    &:hover{
+      background: none;
+      text-decoration: underline;
+    }
+  }
   `
 
 const Logo = styled.img`
@@ -33,17 +47,49 @@ const Logo = styled.img`
 `
 
 const Header = () => {
+  const user = sessionStorage.getItem('username')
+
+  const navigate = useNavigate()
+
+  const [anchorEl, setAnchorEl] = useState(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleLogout = () => {
+    sessionStorage.setItem('isAuthenticated', false);
+    navigate('/pedro/')
+  }
+
   return (
     <ContainerHeader>
-      <Logo src={logo}/>
-      <Menu>
-        <li><a>Início</a></li>
-        <li><a>Locação</a></li>
-        <li><a>Vendas</a></li>
-        <li><a>Financeiro</a></li>
-        <li><a>Taxas</a></li>
-        <li><a>Jurídico</a></li>
-      </Menu>
+      <Logo src={logo} />
+      <NavLinks>
+        <li><a>Obras</a></li>
+        <Button
+          id="basic-button"
+          aria-controls={open ? 'basic-menu' : undefined}
+          aria-haspopup="true"
+          aria-expanded={open ? 'true' : undefined}
+          onClick={handleClick}>
+          {user}
+        </Button>
+        <Menu
+          id="basic-menu"
+          anchorEl={anchorEl}
+          open={open}
+          onClose={handleClose}
+          MenuListProps={{
+            'aria-labelledby': 'basic-button',
+          }}
+        >
+          <MenuItem onClick={handleLogout} id="exit-button">Sair</MenuItem>
+        </Menu>
+      </NavLinks>
     </ContainerHeader>
   )
 }

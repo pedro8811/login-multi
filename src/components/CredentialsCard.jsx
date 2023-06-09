@@ -1,11 +1,10 @@
 import styled from 'styled-components';
 import { Input } from 'antd';
 import { AiOutlineUser, AiOutlineLock } from 'react-icons/ai';
-import { useContext, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import logo from '../assets/logo.webp';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { AuthContext } from '../context/AuthContext'
 
 const Card = styled.div`
   width: 400px;
@@ -86,12 +85,9 @@ const Message = styled.p`
 `
 
 const CredentialsCard = () => {
-  const { setIsAuthenticated, isAuthenticated } = useContext(AuthContext);
-
   const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
 
-  const [loginFailed, setLoginFailed] = useState(false);
   const [message, setMessage] = useState('');
   const [isVisible, setIsVisible] = useState(true);
 
@@ -105,12 +101,12 @@ const CredentialsCard = () => {
   }
 
   useEffect(() => {
-    const timer = setTimeout(() => {
+    let timer = setTimeout(() => {
       setIsVisible(false);
     }, 4000);
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [isVisible]);
 
   const handleEmailChange = (event) => {
     setLogin(event.target.value);
@@ -129,7 +125,6 @@ const CredentialsCard = () => {
     if (data.pwd == undefined) {
       setMessage('Por favor, insira a sua senha')
     }
-
     try {
       const response = await axios.post(
         url,
@@ -137,14 +132,13 @@ const CredentialsCard = () => {
         { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
       );
 
-      console.log(response.data);
-
       if (response.data.success == 'true' && response.data.nome != "") {
-        setIsAuthenticated(true);
+        sessionStorage.setItem('isAuthenticated', true);
+        sessionStorage.setItem('username', response.data.nome);
         navigate('/pedro/home');
       } else {
-        setIsAuthenticated(false);
-        setLoginFailed(true);
+        sessionStorage.setItem('isAuthenticated', false);
+        setMessage('Login falhou!')
       }
     } catch (error) {
       console.error('Erros: ' + error);
@@ -153,12 +147,11 @@ const CredentialsCard = () => {
 
   return (
     <Card>
-      <img src={logo} alt="" />
+      <img src={logo} alt="logo multi" />
       <h3>Seja bem-vindo!</h3>
       <form onSubmit={handleSubmit}>
         <Input addonAfter={<AiOutlineUser fontSize={'20px'} />} placeholder="Digite o seu login" value={login} onChange={handleEmailChange} />
         <Input addonAfter={<AiOutlineLock fontSize={'20px'} />} placeholder="Digite sua senha" type="password" value={password} onChange={handlePasswordChange} />
-        <Message>{isVisible && loginFailed && !isAuthenticated ? 'Login falhou!' : ''}</Message>
         <Message>{isVisible && message}</Message>
         <Button type="primary">Entrar</Button>
       </form>
