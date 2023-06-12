@@ -15,7 +15,6 @@ const ContainerHeader = styled.nav`
 `
 
 const NavLinks = styled.ul`
-  padding: 30px;
   list-style-type: none;
   display: flex;
   margin: 0;
@@ -32,6 +31,7 @@ const NavLinks = styled.ul`
     }
   }
   #basic-button{
+    margin-right: 30px;
     font-family: 'Montserrat', sans-serif;
     color: #000;
     &:hover{
@@ -69,7 +69,6 @@ const Header = () => {
     <ContainerHeader>
       <Logo src={logo} />
       <NavLinks>
-        <li><a>Obras</a></li>
         <Button
           id="basic-button"
           aria-controls={open ? 'basic-menu' : undefined}

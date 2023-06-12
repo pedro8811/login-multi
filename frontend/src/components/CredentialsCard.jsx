@@ -120,10 +120,10 @@ const CredentialsCard = () => {
     e.preventDefault();
 
     if (data.login == undefined) {
-      setMessage('Por favor, insira o seu login')
+      setMessage('Login falhou!')
     }
     if (data.pwd == undefined) {
-      setMessage('Por favor, insira a sua senha')
+      setMessage('Login falhou!')
     }
     try {
       const response = await axios.post(
@@ -131,14 +131,14 @@ const CredentialsCard = () => {
         data,
         { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
       );
-
-      if (response.data.success == 'true' && response.data.nome != "") {
+      if (response.data.success == 'false') {
+        sessionStorage.setItem('isAuthenticated', false);
+        setMessage('Login falhou!')
+      } else if (response.data.success == 'true' && response.data.nome != "") {
         sessionStorage.setItem('isAuthenticated', true);
         sessionStorage.setItem('username', response.data.nome);
         navigate('/pedro/home');
-      } else {
-        sessionStorage.setItem('isAuthenticated', false);
-        setMessage('Login falhou!')
+        return
       }
     } catch (error) {
       console.error('Erros: ' + error);
