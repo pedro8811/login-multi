@@ -6,6 +6,7 @@ import Card from '@mui/material/Card';
 import CardActions from '@mui/material/CardActions';
 import CardContent from '@mui/material/CardContent';
 import Button from '@mui/material/Button';
+import axios from 'axios';
 
 const Container = styled.div`
   width: 100%;
@@ -16,7 +17,7 @@ const Grid = styled.div`
   display: grid;
   padding: 30px;
   grid-template-columns: repeat(4, 1fr);
-  grid-template-rows: repeat(5, 1fr);
+  grid-template-rows: repeat(1, 1fr);
   grid-column-gap: 10px;
   grid-row-gap: 10px;
   @media (min-width: '700px'){
@@ -31,7 +32,7 @@ const Home = () => {
   const [os, setOs] = useState({})
   const [fotos, setFotos] = useState('')
   const [error, setError] = useState('')
-  const [imageData, setImageData] = useState('')
+  const [selectedImage, setSelectedImage] = useState(null)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -54,11 +55,26 @@ const Home = () => {
     }
   }, [os, fotos])
 
-  const image = fotos.image
 
-  useEffect((image) => {
-    console.log(image)
-  },[])
+
+  const handleImageUpload = async () => {
+    try {
+      const formData = new FormData();
+      formData.append('image', selectedImage);
+
+      await axios.post('/upload', formData);
+
+      console.log('Imagem enviada com sucesso!');
+    } catch (error) {
+      console.error('Erro ao enviar a imagem:', error);
+    }
+  };
+
+  const handleImageChange = (event) => {
+    setSelectedImage(event.target.files[0]);
+  };
+
+
 
   return (
     <div>
@@ -103,6 +119,8 @@ const Home = () => {
             </CardActions>
           </Card>
         </Grid>
+        <input type="file" accept="image/*" onChange={handleImageChange} />
+        <button onClick={handleImageUpload}>Enviar Imagem</button>
         {error && <p>{error}</p>}
       </Container>
     </div>
