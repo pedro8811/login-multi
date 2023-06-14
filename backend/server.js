@@ -25,27 +25,20 @@ app.get('/', (req, res) => {
   })
 })
 
-app.post('/upload', upload.single('image'), (req, res) => {
-  try {
-    const { originalname, buffer } = req.file;
-
-    const imageData = buffer.toString('base64');
-
-    // Inserir a imagem no banco de dados
-    const sql = 'INSERT INTO crud.multi_images (filename, data) VALUES (?, ?)';
-    db.query(sql, [originalname, imageData], (err, result) => {
-      if (err) {
-        console.error(err);
-        res.status(500).send('Erro ao fazer o upload da imagem no banco de dados.');
-      } else {
-        res.status(200).send('Imagem salva com sucesso!');
-      }
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).send('Erro ao fazer o upload da imagem.');
-  }
-});
+app.post('/upload', upload.single('OsImage'), (req, res) => {
+  file = req.file
+  image = file.buffer
+  console.log(image)
+  const sql = 'INSERT INTO multi_images (image) VALUES (?)';
+  db.query(sql, [image], (err, result) => {
+    if (err) {
+      console.error(err);
+      return res.sendStatus(500);
+    }
+    console.log('Imagem inserida com sucesso no banco de dados.');
+    return res.sendStatus(200);
+  })
+})
 
 app.listen(8800, () => {
   console.log('Listening on port 8800')
