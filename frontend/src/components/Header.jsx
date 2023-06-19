@@ -43,7 +43,7 @@ const NavLinks = styled.ul`
 
 const Logo = styled.img`
   padding: 30px;
-  width: 150px;
+  width: 190px;
 `
 
 const Header = () => {

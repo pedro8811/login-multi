@@ -6,7 +6,7 @@ import Home from './pages/Home.jsx'
 import Login from './pages/Login.jsx'
 import Error from './pages/Error404.jsx'
 import AuthError from './pages/AuthError.jsx'
-// import PrivateRoute from './components/PrivateRoute.jsx'
+import OrdemServico from './pages/OrdemServico.jsx'
 
 import './global-style.css'
 
@@ -17,8 +17,11 @@ const router = createBrowserRouter([
   },
   {
     path: "/pedro/home",
-    //element: <PrivateRoute element={<Home />} />,
     element: <Home />,
+  },
+  {
+    path: '/pedro/:os',
+    element: <OrdemServico />
   },
   {
     path: "*",
