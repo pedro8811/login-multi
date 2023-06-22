@@ -1,13 +1,25 @@
 import styled from 'styled-components'
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap/dist/js/bootstrap.js'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useEffect } from 'react'
 import Header from '../components/Header'
 import { GrClose } from 'react-icons/gr'
-import { Button, Tooltip, IconButton } from '@mui/material'
+import { Button, Tooltip, IconButton, Backdrop, Box, Modal, Fade } from '@mui/material'
 import { MdAddPhotoAlternate } from 'react-icons/md'
 import { useState } from 'react'
+
+const style = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 470,
+  bgcolor: 'background.paper',
+  borderRadius: '5px',
+  boxShadow: 24,
+  p: 4,
+};
 
 const Container = styled.div`
   width: 100%;
@@ -48,14 +60,18 @@ const Grid = styled.div`
     div:nth-child(2){
     }
   }
-  #icon{
-    float: right;
-    font-size: 20px;
+  #icon-close{
+    font-size: 25px;
   }
   .form{
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(2,1fr);
     align-items: center;
     label{
+      #icon-img{
+        font-size: 38px;
+      }
+      text-align: center;
       color: rgb(46,125,50);
       transition: all .2s;
       &:hover{
@@ -69,31 +85,49 @@ const Grid = styled.div`
 const ImgGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
+  a{
+    cursor: pointer;
+    border: 2px solid transparent;
+    &:hover{
+      border: 2px solid #575757;
+    }
+  }
 `
 
 const OrdemServico = () => {
   const { os } = useParams()
   const [data, setData] = useState([])
-  const [url, setUrl] = useState('')
+  //const [url, setUrl] = useState('')
+  const [arrayImg, setArrayImg] = useState([])
+
+  const [open, setOpen] = useState(false);
+  const handleOpen = () => setOpen(true);
+  const handleClose = () => setOpen(false);
+
+  const navigate = useNavigate()
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await fetch(`http://localhost:8800/${os}`);
         const jsonData = await response.json();
-        setData(jsonData)
-        const arrayImg = await data.map(obj => obj.image)
-        const image = await arrayImg[0]
-        console.log(image)
-        const imageData = await image['data']
-        console.log(imageData)
-        setUrl(imageData.toString('base64'))
+        setData(jsonData);
+        console.log(data)
       } catch (error) {
-        console.log(error)
+        console.error(error);
       }
     };
     fetchData();
-  }, [])
+    setArrayImg(data.map(obj => obj.image))
+  }, []);
+
+  useEffect(() => {
+    if (data.length > 0 && arrayImg.length > 0) {
+      const image = arrayImg[0];
+      const imageData = image['data'];
+      console.log(imageData)
+    }
+  }, [arrayImg]);
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -111,6 +145,14 @@ const OrdemServico = () => {
       });
   };
 
+  const handleOs = () => {
+    navigate(`/pedro/home`)
+  }
+
+  const handleClick = () => {
+    window.location.reload()
+  }
+
   return (
     <div>
       <Header />
@@ -126,15 +168,15 @@ const OrdemServico = () => {
             <div className='buttons'>
               <div>
                 <Tooltip title="Fechar">
-                  <IconButton href="/pedro/home">
-                    <GrClose id="icon" />
+                  <IconButton onClick={() => handleOs()}>
+                    <GrClose id="icon-close" />
                   </IconButton>
                 </Tooltip>
               </div>
               <form onSubmit={handleSubmit} className='form'>
                 <Tooltip className="label" title="Inserir imagens">
                   <label htmlFor={`picture__input_${os}`}>
-                    <MdAddPhotoAlternate id="icon" />
+                    <MdAddPhotoAlternate id="icon-img" />
                   </label>
                 </Tooltip>
                 <input
@@ -152,6 +194,7 @@ const OrdemServico = () => {
                   className='btn btn-success'
                   variant="contained"
                   color="success"
+                  onClick={handleClick}
                   type="submit">
                   Enviar
                 </Button>
@@ -161,10 +204,32 @@ const OrdemServico = () => {
           <hr />
           <h1>Fotos</h1>
           <ImgGrid>
-            <img src={url} alt="" />
+            <a onClick={handleOpen}>
+              <img src='https://picsum.photos/id/16/399/230' alt="" />
+            </a>
           </ImgGrid>
         </section>
       </Container>
+
+      <Modal
+        aria-labelledby="transition-modal-title"
+        aria-describedby="transition-modal-description"
+        open={open}
+        onClose={handleClose}
+        closeAfterTransition
+        slots={{ backdrop: Backdrop }}
+        slotProps={{
+          backdrop: {
+            timeout: 200,
+          },
+        }}
+      >
+        <Fade in={open}>
+          <Box sx={style}>
+            <img src='https://picsum.photos/id/16/399/230' alt="" />
+          </Box>
+        </Fade>
+      </Modal>
     </div>
   )
 }

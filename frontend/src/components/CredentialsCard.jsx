@@ -8,7 +8,6 @@ import { useNavigate } from 'react-router-dom';
 
 const Card = styled.div`
   width: 400px;
-  height: 350px;
   background: #f0f0f0;
   padding: 25px;
   box-shadow: 1px 2px 8px #929292;
