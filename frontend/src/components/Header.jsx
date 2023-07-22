@@ -32,7 +32,7 @@ const NavLinks = styled.ul`
   }
   #basic-button{
     margin-right: 30px;
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'Manrope', sans-serif;
     color: #000;
     &:hover{
       background: none;
@@ -42,8 +42,9 @@ const NavLinks = styled.ul`
   `
 
 const Logo = styled.img`
-  padding: 30px;
-  width: 190px;
+  cursor: pointer;
+  padding: 20px;
+  width: 210px;
 `
 
 const Header = () => {
@@ -62,12 +63,14 @@ const Header = () => {
 
   const handleLogout = () => {
     sessionStorage.setItem('isAuthenticated', false);
-    navigate('/pedro/')
+    navigate('/')
   }
 
   return (
     <ContainerHeader>
-      <Logo src={logo} />
+      <a onClick={() => navigate('/home')}>
+        <Logo src={logo} />
+      </a>
       <NavLinks>
         <Button
           id="basic-button"

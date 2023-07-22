@@ -8,7 +8,7 @@ const Container = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  background-image: url("https://www.multi.com.br/pedro/images/smooth-white-plaster-wall.webp");
+  background-image: url("http://servicos.multi.com.br/images/smooth-white-plaster-wall.webp");
   background-repeat: no-repeat;
   background-size: cover;
 `

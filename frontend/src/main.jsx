@@ -12,15 +12,15 @@ import './global-style.css'
 
 const router = createBrowserRouter([
   {
-    path: "/pedro/",
+    path: "/",
     element: <Login />,
   },
   {
-    path: "/pedro/home",
+    path: "/home",
     element: <Home />,
   },
   {
-    path: '/pedro/:os',
+    path: '/:os',
     element: <OrdemServico />
   },
   {
@@ -28,7 +28,7 @@ const router = createBrowserRouter([
     element: <Error />
   },
   {
-    path: "/pedro/auth-error",
+    path: "/auth-error",
     element: <AuthError />
   }
 ])

@@ -32,9 +32,9 @@ const AuthError = () => {
     <Container>
       <h1>Você não tem acesso a esta seção do site!</h1>
       <h5>Faça o login para poder entrar.</h5>
-      <a href="/pedro/">Retornar a página de login</a>
+      <a href="/">Retornar a página de login</a>
     </Container>
-  )  
+  )
 }
 
 export default AuthError;

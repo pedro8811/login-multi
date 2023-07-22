@@ -5,35 +5,57 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useEffect } from 'react'
 import Header from '../components/Header'
 import { GrClose } from 'react-icons/gr'
-import { Button, Tooltip, IconButton, Backdrop, Box, Modal, Fade } from '@mui/material'
+import {
+  Button,
+  Tooltip,
+  IconButton,
+  Box,
+  Modal,
+  CircularProgress
+} from '@mui/material'
 import { MdAddPhotoAlternate } from 'react-icons/md'
 import { useState } from 'react'
+import { host } from '../utils/env.js'
 
 const style = {
   position: 'absolute',
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: 470,
+  width: '70%',
   bgcolor: 'background.paper',
-  borderRadius: '5px',
+  border: '2px solid #000',
   boxShadow: 24,
+  p: 4,
+};
+
+const styleLoading = {
+  position: 'absolute',
+  textAlign: 'center',
+  color: 'white',
+  fontSize: '40px',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 400,
   p: 4,
 };
 
 const Container = styled.div`
   width: 100%;
-  padding: 25px 100px;
-  font-family: 'Montserrat';
+  padding: 45px 100px;
+  font-family: 'Manrope';
   section{
-    h1{
-      font-size: 20px;
-    }
     padding: 15px;
     background: rgb(255, 255, 255);
     border-radius: 5px;
     border: 1px solid #a7a7a7;
-    box-shadow: 0 0 2px rgba(0,0,0,.3);
+    -webkit-box-shadow: 0px 0px 10px 1px rgba(0,0,0,0.75);
+    -moz-box-shadow: 0px 0px 10px 1px rgba(0,0,0,0.75);
+    box-shadow: 0px 0px 10px 1px rgba(0,0,0,0.75);
+    h1{
+      font-size: 20px;
+    }
     p{
       font-size: 18px;
       margin: 0;
@@ -84,8 +106,11 @@ const Grid = styled.div`
 
 const ImgGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(5, 1fr);
   a{
+    img{
+      width: 100%;
+    }
     cursor: pointer;
     border: 2px solid transparent;
     &:hover{
@@ -94,38 +119,71 @@ const ImgGrid = styled.div`
   }
 `
 
+const isValidNumber = (value) => {
+  return /^\d+$/.test(value);
+}
+
 const OrdemServico = () => {
   const { os } = useParams()
-  const [data, setData] = useState([])
-  //const [url, setUrl] = useState('')
-  const [arrayImg, setArrayImg] = useState([])
-
-  const [open, setOpen] = useState(false);
-  const handleOpen = () => setOpen(true);
-  const handleClose = () => setOpen(false);
-
   const navigate = useNavigate()
+
+  if (!isValidNumber(os)) {
+    navigate('/home')
+  }
+
+  const [data, setData] = useState([])
+  const [base64, setBase64] = useState([])
+  const [arrayImg, setArrayImg] = useState([])
+  const [open, setOpen] = useState(false);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [openLoading, setOpenLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true)
+
+  const handleOpenModal = (index) => {
+    setOpen(true);
+    setSelectedImage(base64[index]);
+  };
+
+  const handleCloseModal = () => {
+    setOpen(false);
+  };
+
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch(`http://localhost:8800/${os}`);
+        const response = await fetch(`${host}/${os}`);
         const jsonData = await response.json();
-        setData(jsonData);
-        console.log(data)
+        setData(jsonData)
+        setIsLoading(false)
       } catch (error) {
         console.error(error);
       }
     };
     fetchData();
-    setArrayImg(data.map(obj => obj.image))
-  }, []);
+  }, [os]);
 
   useEffect(() => {
+    setArrayImg(data.map(obj => obj.image.data));
+  }, [data]);
+
+  useEffect(() => {
+    const imageBase64 = []
     if (data.length > 0 && arrayImg.length > 0) {
-      const image = arrayImg[0];
-      const imageData = image['data'];
-      console.log(imageData)
+      const arrayBufferToBase64 = (buffer) => {
+        let binary = '';
+        const bytes = new Uint8Array(buffer);
+        const len = bytes.byteLength;
+        for (let i = 0; i < len; i++) {
+          binary += String.fromCharCode(bytes[i]);
+        }
+        return window.btoa(binary);
+      };
+      arrayImg.forEach((image) => {
+        const base = arrayBufferToBase64(image);
+        imageBase64.push(base)
+      });
+      setBase64(imageBase64);
     }
   }, [arrayImg]);
 
@@ -133,7 +191,7 @@ const OrdemServico = () => {
     event.preventDefault();
     const formData = new FormData(event.target);
 
-    fetch('http://localhost:8800/upload', {
+    fetch(`${host}/upload`, {
       method: 'POST',
       body: formData
     })
@@ -146,11 +204,14 @@ const OrdemServico = () => {
   };
 
   const handleOs = () => {
-    navigate(`/pedro/home`)
+    navigate(`/home`)
   }
 
   const handleClick = () => {
-    window.location.reload()
+    setOpenLoading(true)
+    setTimeout(() => {
+      window.location.reload()
+    }, 1000)
   }
 
   return (
@@ -203,33 +264,43 @@ const OrdemServico = () => {
           </Grid>
           <hr />
           <h1>Fotos</h1>
-          <ImgGrid>
-            <a onClick={handleOpen}>
-              <img src='https://picsum.photos/id/16/399/230' alt="" />
-            </a>
-          </ImgGrid>
+          {isLoading ? (
+            <CircularProgress />
+          ) : base64.length ? (
+            <ImgGrid>
+              {base64.map((image, index) => (
+                <a key={index} onClick={() => handleOpenModal(index)}>
+                  <img src={`data:image/jpeg;base64, ${image}`} alt="" />
+                </a>
+              ))}
+            </ImgGrid>
+          ) : (
+            <p>Não há imagens nesta O.S</p>
+          )}
         </section>
+        <Modal
+          open={open}
+          onClose={handleCloseModal}
+          aria-labelledby="modal-modal-title"
+          aria-describedby="modal-modal-description"
+        >
+          <Box sx={style}>
+            {selectedImage && <img width="100%" src={`data:image/jpeg;base64, ${selectedImage}`} alt="" />}
+          </Box>
+        </Modal>
       </Container>
 
+
       <Modal
-        aria-labelledby="transition-modal-title"
-        aria-describedby="transition-modal-description"
-        open={open}
-        onClose={handleClose}
-        closeAfterTransition
-        slots={{ backdrop: Backdrop }}
-        slotProps={{
-          backdrop: {
-            timeout: 200,
-          },
-        }}
+        open={openLoading}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
       >
-        <Fade in={open}>
-          <Box sx={style}>
-            <img src='https://picsum.photos/id/16/399/230' alt="" />
-          </Box>
-        </Fade>
+        <Box sx={styleLoading}>
+          <CircularProgress color="inherit" />
+        </Box>
       </Modal>
+
     </div>
   )
 }
