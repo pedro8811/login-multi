@@ -22,9 +22,8 @@ const style = {
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: '70%',
+  width: 'auto',
   bgcolor: 'background.paper',
-  border: '2px solid #000',
   boxShadow: 24,
   p: 4,
 };
@@ -108,13 +107,15 @@ const ImgGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   a{
+    display: flex;
+    align-items: center;
     img{
       width: 100%;
     }
     cursor: pointer;
     border: 2px solid transparent;
     &:hover{
-      border: 2px solid #575757;
+      border: 2px solid #075800;
     }
   }
 `
@@ -126,6 +127,12 @@ const isValidNumber = (value) => {
 const OrdemServico = () => {
   const { os } = useParams()
   const navigate = useNavigate()
+
+  useEffect(() => {
+    if(!sessionStorage.getItem('isAuthenticated')){
+      navigate('/')
+    }
+  })
 
   if (!isValidNumber(os)) {
     navigate('/home')
@@ -147,7 +154,6 @@ const OrdemServico = () => {
   const handleCloseModal = () => {
     setOpen(false);
   };
-
 
   useEffect(() => {
     const fetchData = async () => {
@@ -289,7 +295,6 @@ const OrdemServico = () => {
           </Box>
         </Modal>
       </Container>
-
 
       <Modal
         open={openLoading}

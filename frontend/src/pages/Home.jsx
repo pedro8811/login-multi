@@ -78,11 +78,11 @@ const Home = () => {
   const navigate = useNavigate()
   const [open, setOpen] = useState(false)
 
-  useEffect(() => {
-    if(!sessionStorage.getItem('isAuthenticated')){
-      navigate('/')
-    }
-  })
+  // useEffect(() => {
+  //   if(!sessionStorage.getItem('isAuthenticated')){
+  //     navigate('/')
+  //   }
+  // })
 
   const handleClose = (event, reason) => {
     if (reason === 'clickaway') {
