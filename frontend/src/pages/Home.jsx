@@ -1,11 +1,10 @@
 import Header from '../components/Header.jsx'
 import styled from 'styled-components'
-import { useEffect, useState } from 'react';
-import { Button, CardContent, CardActions, Snackbar, Alert } from '@mui/material';
+import { useState, useEffect } from 'react';
+import { Button, CardContent, CardActions, Snackbar, Alert, CircularProgress } from '@mui/material';
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap/dist/js/bootstrap.js'
 import { useNavigate } from 'react-router-dom';
-import { host } from '../utils/env.js'
 
 const Container = styled.div`
   width: 100%;
@@ -77,12 +76,30 @@ const Title = styled.h1`
 const Home = () => {
   const navigate = useNavigate()
   const [open, setOpen] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [data, setData] = useState([])
 
-  // useEffect(() => {
-  //   if(!sessionStorage.getItem('isAuthenticated')){
-  //     navigate('/')
-  //   }
-  // })
+  useEffect(() => {
+    if (!sessionStorage.getItem('isAuthenticated')) {
+      navigate('/')
+    }
+  })
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await fetch(`http://multi.com.br/app/os.php?id=123`)
+        const jsonData = await response.json()
+        setData(jsonData)
+        setIsLoading(false)
+      } catch (error) {
+        console.error('Error' + error)
+      }
+    }
+    fetchData()
+  })
+
+  console.log(data)
 
   const handleClose = (event, reason) => {
     if (reason === 'clickaway') {
@@ -91,44 +108,40 @@ const Home = () => {
     setOpen(false);
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(host);
-        const jsonData = await response.json();
-        console.log(jsonData)
-      } catch (error) {
-        setOpen(true)
-        console.log(error)
-      }
-    };
-    fetchData();
-  }, [])
-
   const handleOs = (os) => {
     navigate(`/${os}`)
   }
 
-  const arrayDeOs = [1, 2, 3, 4, 5, 6]
+  const arrayDeOs = [1]
 
   return (
     <div>
       <Header />
       <Container>
-        <Grid>
-          {arrayDeOs.map(os => (
-            <div className="card" key={os}>
-              <CardContent className="card-content">
-                <Title>Ordem de serviço: <p>&nbsp;{os}</p></Title>
-                <Title>Endereço: ...</Title>
-                <Title>Código do imóvel: ...</Title>
-              </CardContent>
-              <CardActions>
-                <Button variant="contained" color="success" onClick={() => handleOs(os)} >Abrir OS</Button>
-              </CardActions>
-            </div>
-          ))}
-        </Grid>
+        {isLoading ? (
+          <div >
+            <CircularProgress />
+          </div>
+        ) : arrayDeOs.length ? (
+          <Grid>
+            {arrayDeOs.map(os => (
+              <div className="card" key={os}>
+                <CardContent className="card-content">
+                  <Title>Ordem de serviço: <p>&nbsp;{os}</p></Title>
+                  <Title>Endereço: ...</Title>
+                  <Title>Código do imóvel: ...</Title>
+                </CardContent>
+                <CardActions>
+                  <Button variant="contained" color="success" onClick={() => handleOs(os)} >Abrir OS</Button>
+                </CardActions>
+              </div>
+            ))}
+          </Grid>
+        ) : (
+          <div style={{ textAlign: 'center', marginTop: '30px' }}>
+            <p style={{ fontSize: '22px', color: '#3a3a3a' }}>Não há ordens de serviço ativas</p>
+          </div>
+        )}
       </Container>
       <Snackbar open={open} autoHideDuration={6000} onClose={handleClose}>
         <Alert onClose={handleClose} severity="error" sx={{ width: '100%' }}>

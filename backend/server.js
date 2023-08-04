@@ -47,58 +47,6 @@ app.get('/', (req, res) => {
   })
 })
 
-// app.post('/upload', upload.array('OsImage'), async (req, res) => {
-//   try {
-//     const files = req.files;
-//     console.log(files)
-//     const os = req.body.os;
-//     const base64Images = await Promise.all(files.map(file => file.buffer.toString('base64')));
-
-//     if (base64Images.length === 0) {
-//       res.status(400).send('Nenhuma imagem foi selecionada.');
-//       return;
-//     }
-
-//     for (const base64Image of base64Images) {
-//       await new Promise((resolve, reject) => {
-//         const sql = 'INSERT INTO multi.images_os (image, idos) VALUES (?, ?)';
-//         db.query(sql, [base64Image, os], (err, result) => {
-//           if (err) {
-//             console.log(err);
-//             reject(err);
-//             res.status(400).send('Ocorreu um erro ao enviar a imagem.');
-//           } else {
-//             console.log('Imagem inserida com sucesso no banco de dados');
-//             resolve();
-//           }
-//         });
-//       });
-//     }
-
-//     res.sendStatus(200);
-
-//     // base64Images.forEach(async (buffer) => {
-//     //   await new Promise((resolve, reject) => {
-//     //     const sql = 'INSERT INTO multi.images_os (image, idos) VALUES (?,?)';
-//     //     db.query(sql, [buffer, os], (err, result) => {
-//     //       if (err) {
-//     //         console.log(err);
-//     //         reject(err);
-//     //         res.sendStatus(400).send('Ocorreu um erro ao enviar a imagem.')
-//     //       } else {
-//     //         console.log('Imagem inserida com sucesso no banco de dados');
-//     //         resolve();
-//     //         res.sendStatus(200);
-//     //       }
-//     //     });
-//     //   });
-//     // });
-//   } catch (err) {
-//     console.error(err);
-//     res.sendStatus(500);
-//   }
-// });
-
 app.post('/upload', upload.array('OsImage'), async (req, res) => {
   try {
     const files = req.files;

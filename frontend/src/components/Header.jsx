@@ -62,8 +62,8 @@ const Header = () => {
   };
 
   const handleLogout = () => {
-    sessionStorage.setItem('isAuthenticated', false);
     navigate('/')
+    sessionStorage.clear()
   }
 
   return (

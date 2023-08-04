@@ -102,7 +102,17 @@ const CredentialsCard = () => {
         data,
         { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
       );
-      console.log(response.data)
+
+
+
+
+      sessionStorage.setItem('userToken', response.data.sessionToken)
+      const userId = sessionStorage.getItem('userToken')
+      // console.log(userId)
+
+
+
+
       if (data.login == undefined || data.login == '') {
         setMessage('Login falhou!')
         setShow(true)

@@ -14,6 +14,7 @@ const Container = styled.div`
 `
 
 function Login() {
+  sessionStorage.clear()
   return (
     <Container>
       <CredentialsCard />

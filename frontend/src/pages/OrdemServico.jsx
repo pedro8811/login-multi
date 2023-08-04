@@ -134,6 +134,12 @@ const OrdemServico = () => {
     }
   })
 
+  useEffect(() => {
+    if(sessionStorage.getItem('isAuthenticated') === false){
+      navigate('/')
+    }
+  })
+
   if (!isValidNumber(os)) {
     navigate('/home')
   }
@@ -257,21 +263,25 @@ const OrdemServico = () => {
                   id={`picture__input_${os}`}
                   className="picture__input"
                   accept="image/*" />
-                <Button
-                  className='btn btn-success'
-                  variant="contained"
-                  color="success"
-                  onClick={handleClick}
-                  type="submit">
-                  Enviar
-                </Button>
+                <Tooltip title="Clicar neste botão após inserir as imagens no botão ao lado">
+                  <Button
+                    className='btn btn-success'
+                    variant="contained"
+                    color="success"
+                    onClick={handleClick}
+                    type="submit">
+                    Enviar
+                  </Button>
+                </Tooltip>
               </form>
             </div>
           </Grid>
           <hr />
           <h1>Fotos</h1>
           {isLoading ? (
-            <CircularProgress />
+            <div style={{ textAlign: 'center' }}>
+              <CircularProgress />
+            </div>
           ) : base64.length ? (
             <ImgGrid>
               {base64.map((image, index) => (
@@ -281,7 +291,9 @@ const OrdemServico = () => {
               ))}
             </ImgGrid>
           ) : (
-            <p>Não há imagens nesta O.S</p>
+            <div style={{ textAlign: 'center' }}>
+              <p style={{ fontSize: '22px', color: '#3a3a3a' }}>Não há imagens nesta O.S</p>
+            </div>
           )}
         </section>
         <Modal

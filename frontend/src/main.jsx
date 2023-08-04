@@ -20,7 +20,7 @@ const router = createBrowserRouter([
     element: <Home />,
   },
   {
-    path: '/:os',
+    path: "/:os",
     element: <OrdemServico />
   },
   {
