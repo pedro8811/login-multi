@@ -33,7 +33,7 @@ db.connect((err) => {
 })
 
 app.get('/version', (req, res) => {
-  res.send('1.6')
+  res.send('1.1')
 })
 
 app.get('/', (req, res) => {
@@ -54,7 +54,7 @@ app.post('/upload', upload.array('OsImage'), async (req, res) => {
     const os = req.body.os;
     const base64Images = await Promise.all(files.map(file => file.buffer));
 
-    if (base64Images.length === 0) {
+    if (base64Images.length === 0 || files.length == 0) {
       res.status(400).send('Nenhuma imagem foi selecionada.');
       return;
     }

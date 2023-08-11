@@ -5,6 +5,7 @@ import MenuItem from '@mui/material/MenuItem';
 import { useState } from 'react';
 import Button from '@mui/material/Button';
 import { useNavigate } from 'react-router-dom';
+import {font} from '../utils/env'
 
 const ContainerHeader = styled.nav`
   display: flex;
@@ -32,7 +33,7 @@ const NavLinks = styled.ul`
   }
   #basic-button{
     margin-right: 30px;
-    font-family: 'Manrope', sans-serif;
+    font-family: ${font}, sans-serif;
     color: #000;
     &:hover{
       background: none;
@@ -62,8 +63,8 @@ const Header = () => {
   };
 
   const handleLogout = () => {
-    navigate('/')
     sessionStorage.clear()
+    navigate('/')
   }
 
   return (

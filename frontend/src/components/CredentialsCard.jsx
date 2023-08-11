@@ -5,6 +5,8 @@ import { useState } from 'react';
 import logo from '../assets/logo.webp';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { font } from '../utils/env'
+import { Snackbar, Alert } from '@mui/material'
 
 const Card = styled.div`
   width: 400px;
@@ -12,7 +14,7 @@ const Card = styled.div`
   padding: 25px;
   box-shadow: 1px 2px 8px #929292;
   color: #575757;
-  font-family: 'Manrope';
+  font-family: ${font};
   border-radius: 10px;
   display: flex;
   text-align: center;
@@ -31,8 +33,9 @@ const Card = styled.div`
     span{
       input{
         height: 40px;
+        font-family: ${font};
         ::placeholder{
-          font-family: 'Manrope';
+          font-family: ${font};
           font-size: 16px;
           color: #969696;
         }
@@ -52,7 +55,7 @@ const Button = styled.button`
   padding: 10px;
   border-radius: 10px;
   border: none;
-  font-family: 'Manrope';
+  font-family: ${font};
   font-size: 1.2em;
   width: 100%;
   margin-top: 10px;
@@ -86,6 +89,15 @@ const CredentialsCard = () => {
     interno: true,
   }
 
+  const [open, setOpen] = useState(false);
+
+  const handleClose = (event, reason) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setOpen(false);
+  };
+
   const handleEmailChange = (event) => {
     setLogin(event.target.value);
   };
@@ -103,15 +115,9 @@ const CredentialsCard = () => {
         { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
       );
 
-
-
-
-      sessionStorage.setItem('userToken', response.data.sessionToken)
-      const userId = sessionStorage.getItem('userToken')
-      // console.log(userId)
-
-
-
+      // sessionStorage.setItem('userToken', response.data.sessionToken)
+      // const userId = sessionStorage.getItem('userToken')
+      // // console.log(userId)
 
       if (data.login == undefined || data.login == '') {
         setMessage('Login falhou!')
@@ -133,6 +139,7 @@ const CredentialsCard = () => {
       }
     } catch (error) {
       console.error('Erros: ' + error);
+      setOpen(true)
     }
     setTimeout(() => {
       setShow(false);
@@ -149,6 +156,13 @@ const CredentialsCard = () => {
         {show && <Message>{message}</Message>}
         <Button type="primary">Entrar</Button>
       </form>
+      <Snackbar
+        open={open}
+        autoHideDuration={5000}
+        onClose={handleClose}
+      >
+        <Alert severity="error">Houve um problema com a conexão</Alert>
+      </Snackbar>
     </Card>
   )
 }

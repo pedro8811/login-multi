@@ -11,11 +11,13 @@ import {
   IconButton,
   Box,
   Modal,
-  CircularProgress
+  CircularProgress,
+  Snackbar,
+  Alert
 } from '@mui/material'
 import { MdAddPhotoAlternate } from 'react-icons/md'
 import { useState } from 'react'
-import { host } from '../utils/env.js'
+import { host, font } from '../utils/env.js'
 
 const style = {
   position: 'absolute',
@@ -26,6 +28,17 @@ const style = {
   bgcolor: 'background.paper',
   boxShadow: 24,
   p: 4,
+};
+
+const styleFinal = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 600,
+  bgcolor: 'background.paper',
+  borderRadius: '5px',
+  boxShadow: 10,
 };
 
 const styleLoading = {
@@ -43,7 +56,7 @@ const styleLoading = {
 const Container = styled.div`
   width: 100%;
   padding: 45px 100px;
-  font-family: 'Manrope';
+  font-family: ${font};
   section{
     padding: 15px;
     background: rgb(255, 255, 255);
@@ -59,6 +72,13 @@ const Container = styled.div`
       font-size: 18px;
       margin: 0;
       padding: 0;
+    }
+  }
+  .alert-error{
+    background-color: red;
+    color: white;
+    svg{
+      color: white;
     }
   }
 `
@@ -120,6 +140,11 @@ const ImgGrid = styled.div`
   }
 `
 
+const Form = styled.form`
+  font-family: ${font};
+  font-weight: 400;
+`
+
 const isValidNumber = (value) => {
   return /^\d+$/.test(value);
 }
@@ -127,23 +152,6 @@ const isValidNumber = (value) => {
 const OrdemServico = () => {
   const { os } = useParams()
   const navigate = useNavigate()
-
-  useEffect(() => {
-    if(!sessionStorage.getItem('isAuthenticated')){
-      navigate('/')
-    }
-  })
-
-  useEffect(() => {
-    if(sessionStorage.getItem('isAuthenticated') === false){
-      navigate('/')
-    }
-  })
-
-  if (!isValidNumber(os)) {
-    navigate('/home')
-  }
-
   const [data, setData] = useState([])
   const [base64, setBase64] = useState([])
   const [arrayImg, setArrayImg] = useState([])
@@ -151,6 +159,27 @@ const OrdemServico = () => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [openLoading, setOpenLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(true)
+  const [openError, setOpenError] = useState(false)
+
+  const [openFinal, setOpenFinal] = useState(false);
+  const handleOpenFinal = () => setOpenFinal(true);
+  const handleCloseFinal = () => setOpenFinal(false);
+
+  useEffect(() => {
+    if (!sessionStorage.getItem('isAuthenticated')) {
+      navigate('/')
+    }
+  })
+
+  useEffect(() => {
+    if (sessionStorage.getItem('isAuthenticated') === false) {
+      navigate('/')
+    }
+  })
+
+  if (!isValidNumber(os)) {
+    navigate('/home')
+  }
 
   const handleOpenModal = (index) => {
     setOpen(true);
@@ -208,22 +237,43 @@ const OrdemServico = () => {
       body: formData
     })
       .then(data => {
+        if (data.status == 400) {
+          setOpenError(true)
+        } else {
+          setOpenLoading(true)
+          setTimeout(() => {
+            window.location.reload()
+          }, 1000)
+        }
+      })
+      .catch();
+  };
+
+  useEffect(() => {
+    //time para fechar aviso de erro de fotos vazias
+    setTimeout(() => {
+      setOpenError(false)
+    }, 5000)
+  })
+
+  const handleSubmitFinal = (event) => {
+    event.preventDefault()
+    const formData = new FormData(event.target);
+
+    fetch('', {
+      method: 'POST',
+      body: formData
+    })
+      .then(data => {
         console.log(data);
       })
       .catch(error => {
         console.error(error);
       });
-  };
+  }
 
   const handleOs = () => {
     navigate(`/home`)
-  }
-
-  const handleClick = () => {
-    setOpenLoading(true)
-    setTimeout(() => {
-      window.location.reload()
-    }, 1000)
   }
 
   return (
@@ -234,9 +284,10 @@ const OrdemServico = () => {
           <Grid>
             <div className='infos'>
               <p>Número da os: {os}</p>
-              <p>Endereço: ...</p>
-              <p>Código do imóvel: ...</p>
-              <p>Status: ...</p>
+              <p>Situação: Ativa</p>
+              <p>Lançamento: </p>
+              <p>Visita: </p>
+              <p>Serviço: </p>
             </div>
             <div className='buttons'>
               <div>
@@ -263,24 +314,67 @@ const OrdemServico = () => {
                   id={`picture__input_${os}`}
                   className="picture__input"
                   accept="image/*" />
-                <Tooltip title="Clicar neste botão após inserir as imagens no botão ao lado">
+                <Tooltip title="Clique neste botão após inserir as imagens no botão ao lado!">
                   <Button
                     className='btn btn-success'
                     variant="contained"
                     color="success"
-                    onClick={handleClick}
-                    type="submit">
-                    Enviar
-                  </Button>
+                    type="submit"
+                    style={{ fontFamily: 'inherit', fontWeight: '500' }}
+                  >Enviar</Button>
                 </Tooltip>
               </form>
+
+              <Button
+                onClick={handleOpenFinal}
+                variant="contained"
+                color="error"
+                style={{ fontFamily: 'inherit', fontWeight: '500' }}
+              >Finalizar</Button>
+
+              <Modal
+                open={openFinal}
+                onClose={handleCloseFinal}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+              >
+                <Box sx={styleFinal} className='p-4'>
+                  <Form onSubmit={handleSubmitFinal}>
+                    <div className="form-group">
+                      <textarea
+                        placeholder='Descrição...'
+                        className="form-control"
+                        id="exampleFormControlTextarea1"
+                        rows="7"
+                        name='descricao'
+                      ></textarea>
+                    </div>
+                    <div className='d-flex justify-content-end mt-4'>
+                      <Button
+                        onClick={handleCloseFinal}
+                        variant='contained'
+                        className='me-2'
+                        color="success"
+                        style={{ fontFamily: 'inherit' }}
+                      >Cancelar</Button>
+                      <Button
+                        type='submit'
+                        variant='contained'
+                        color="error"
+                        style={{ fontFamily: 'inherit' }}
+                      >Finalizar</Button>
+                    </div>
+                  </Form>
+                </Box>
+              </Modal>
+
             </div>
           </Grid>
           <hr />
           <h1>Fotos</h1>
           {isLoading ? (
             <div style={{ textAlign: 'center' }}>
-              <CircularProgress />
+              <CircularProgress color='success' />
             </div>
           ) : base64.length ? (
             <ImgGrid>
@@ -306,8 +400,14 @@ const OrdemServico = () => {
             {selectedImage && <img width="100%" src={`data:image/jpeg;base64, ${selectedImage}`} alt="" />}
           </Box>
         </Modal>
-      </Container>
 
+        <Snackbar open={openError} >
+          <Alert className='alert-error' severity="error" >
+            Nenhuma imagem foi selecionada!
+          </Alert>
+        </Snackbar>
+
+      </Container>
       <Modal
         open={openLoading}
         aria-labelledby="modal-modal-title"
@@ -317,7 +417,6 @@ const OrdemServico = () => {
           <CircularProgress color="inherit" />
         </Box>
       </Modal>
-
     </div>
   )
 }
