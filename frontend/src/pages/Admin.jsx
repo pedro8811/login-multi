@@ -49,12 +49,22 @@ const CardImage = styled.div`
   margin: 10px;
   padding: 20px;
   border-radius: 7px;
+  position: relative;
   box-shadow: 0 0 10px rgba(0,0,0,.5);
-  p{margin: 0;}
+  p{
+    margin: 0;
+    :nth-child(3){
+      margin-bottom: 30px;
+    }
+  }
   img{
     box-shadow: 0 0 10px rgba(0,0,0,.5);
     width: 100%;
     margin-bottom: 10px;
+  }
+  .bottom{
+    position: absolute;
+    bottom: 0;
   }
 `
 
@@ -183,7 +193,7 @@ const Admin = () => {
                 <img src={`data:image/jpeg;base64, ${arrayBufferToBase64(os.image.data)}`} />
                 <p>ID da imagem: {os.idimage}</p>
                 <p>ID da ordem de serviço: <b>{os.idos}</b></p>
-                <form style={{ display: 'flex' }}>
+                <form className='bottom'>
                   <Checkbox
                     checked={selectedItems.includes(os.idimage)}
                     value={os.idimage}

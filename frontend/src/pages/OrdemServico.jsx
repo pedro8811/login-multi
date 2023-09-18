@@ -177,31 +177,27 @@ const OrdemServico = () => {
   const handleOpenFinal = () => setOpenFinal(true);
   const handleCloseFinal = () => setOpenFinal(false);
 
+  // segurança
   useEffect(() => {
     if (!sessionStorage.getItem('isAuthenticated')) {
       navigate('/')
     }
-  })
-
-  useEffect(() => {
     if (sessionStorage.getItem('isAuthenticated') === false) {
       navigate('/')
     }
   })
-
+  // verificar paramentro na url
   if (!isValidNumber(os)) {
     navigate('/home')
   }
-
+  // abrir modal de imagem
   const handleOpenModal = (index) => {
     setOpen(true);
     setSelectedImage(base64[index]);
   };
-
-  const handleCloseModal = () => {
-    setOpen(false);
-  };
-
+  // fechar modal de imagem
+  const handleCloseModal = () => setOpen(false);
+  // fetch nas imagens da os
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -215,7 +211,7 @@ const OrdemServico = () => {
     };
     fetchData();
   }, [os]);
-
+  // fetch nos dados da os
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -228,11 +224,11 @@ const OrdemServico = () => {
     }
     fetchData()
   })
-
+  // função auxiliar para mostrar imagens
   useEffect(() => {
     setArrayImg(data.map(obj => obj.image.data));
   }, [data]);
-
+  // função auxiliar para mostrar imagens
   useEffect(() => {
     const imageBase64 = []
     if (data.length > 0 && arrayImg.length > 0) {
@@ -252,7 +248,7 @@ const OrdemServico = () => {
       setBase64(imageBase64);
     }
   }, [arrayImg]);
-
+  // função de enviar as imagens
   const handleSubmit = (event) => {
     event.preventDefault();
     const formData = new FormData(event.target);
@@ -273,14 +269,13 @@ const OrdemServico = () => {
       })
       .catch();
   };
-
+  //time para fechar aviso de erro de fotos vazias
   useEffect(() => {
-    //time para fechar aviso de erro de fotos vazias
     setTimeout(() => {
       setOpenError(false)
     }, 5000)
   })
-
+  // função de finalizar e enviar OS
   const handleSubmitFinal = (event) => {
     event.preventDefault()
     const formData = new FormData(event.target);
@@ -296,28 +291,22 @@ const OrdemServico = () => {
         console.error(error);
       });
   }
-
-  const handleOs = () => {
-    navigate(`/home`)
-  }
-
+  // função de fechar os / voltar para home
+  const handleCloseOs = () => navigate(`/home`);
+  // função de disabilitar ou habilitar o botão de envio conforme valor do input
   const handleDescChange = (event) => {
     const newValue = event.target.value
     setDesc(event.target.value)
     setButtonDisabled(!newValue.trim());
   }
-
   // função de voltar apertando ESC
   useEffect(() => {
     const handleKeyPress = (e) => {
       if (e.key === 'Escape') {
-        handleOs();
+        handleCloseOs();
       }
     };
-
     window.addEventListener('keydown', handleKeyPress);
-
-    // Remova o ouvinte de evento quando o componente for desmontado
     return () => {
       window.removeEventListener('keydown', handleKeyPress);
     };
@@ -339,7 +328,7 @@ const OrdemServico = () => {
             <div className='buttons'>
               <div>
                 <Tooltip title="Fechar ou pressione 'ESC'">
-                  <IconButton onClick={() => handleOs()}>
+                  <IconButton onClick={() => handleCloseOs()}>
                     <GrClose id="icon-close" />
                   </IconButton>
                 </Tooltip>

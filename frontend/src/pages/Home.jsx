@@ -109,6 +109,7 @@ const Home = () => {
   const [isLoading, setIsLoading] = useState(true)
   const [data, setData] = useState([])
 
+  // segurança
   useEffect(() => {
     if (!sessionStorage.getItem('isAuthenticated')) {
       navigate('/')
@@ -119,7 +120,7 @@ const Home = () => {
   })
 
   const userId = sessionStorage.getItem('userToken')
-
+  // fetch nas os do usuário
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -134,7 +135,7 @@ const Home = () => {
     }
     fetchData()
   }, [])
-
+  // verificar conexão com o banco de dados
   useEffect(() => {
     const hasExecutedBefore = sessionStorage.getItem('hasExecutedBefore');
     if (!hasExecutedBefore) {
@@ -157,10 +158,8 @@ const Home = () => {
 
   const ordens = data.ordens
   const success = data.success
-
-  const handleOs = (os) => {
-    navigate(`/os/${os}`)
-  }
+  // função de direcionamento para OS
+  const handleOs = (os) => navigate(`/os/${os}`);
 
   return (
     <div>

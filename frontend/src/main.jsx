@@ -5,6 +5,7 @@ import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 import Home from './pages/Home.jsx'
 import Login from './pages/Login.jsx'
 import OrdemServico from './pages/OrdemServico.jsx'
+import ErrorPage from './pages/Error.jsx'
 
 import './global-style.css'
 import Admin from './pages/Admin.jsx';
@@ -25,6 +26,14 @@ const router = createBrowserRouter([
   {
     path: "/os/:os",
     element: <OrdemServico />
+  },
+  {
+    path: "/*",
+    element: <ErrorPage />
+  },
+  {
+    path: "/os/*",
+    element: <ErrorPage />
   },
 ])
 
