@@ -5,7 +5,6 @@ import { host, font } from '../utils/env'
 import { useNavigate } from 'react-router-dom'
 import { CircularProgress, IconButton, Tooltip, Modal, Button, Box, Checkbox } from '@mui/material'
 import { MdDelete } from 'react-icons/md'
-import { ImageCard } from '../components/ImageCard'
 
 const modalStyle = {
   position: 'absolute',
@@ -128,9 +127,6 @@ const Admin = () => {
     })
   }
 
-
-
-
   const arrayBufferToBase64 = (buffer) => {
     let binary = '';
     const bytes = new Uint8Array(buffer);
@@ -155,16 +151,6 @@ const Admin = () => {
       })
     }
   }
-
-
-
-  console.log(selectedItems)
-
-
-
-
-
-
 
   return (
     <div>
@@ -195,7 +181,7 @@ const Admin = () => {
             {data.map((os) => (
               <CardImage key={os.idimage}>
                 <img src={`data:image/jpeg;base64, ${arrayBufferToBase64(os.image.data)}`} />
-                <p>ID da imagem: <b>{os.idimage}</b></p>
+                <p>ID da imagem: {os.idimage}</p>
                 <p>ID da ordem de serviço: <b>{os.idos}</b></p>
                 <form style={{ display: 'flex' }}>
                   <Checkbox
