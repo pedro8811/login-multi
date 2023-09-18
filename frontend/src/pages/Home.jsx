@@ -5,7 +5,7 @@ import { Button, CardContent, CardActions, Snackbar, Alert, CircularProgress } f
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap/dist/js/bootstrap.js'
 import { useNavigate } from 'react-router-dom';
-import { font } from '../utils/env.js';
+import { font, formatarData, host } from '../utils/env.js';
 
 const Container = styled.div`
   width: 100%;
@@ -118,10 +118,13 @@ const Home = () => {
     }
   })
 
+  const userId = sessionStorage.getItem('userToken')
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch('https://www.multi.com.br/app/os.php?id=123');
+        const response = await fetch(`https://www.multi.com.br/app/os.php?id=${userId}`);
+        // const response = await fetch(`https://www.multi.com.br/app/os.php?id=138`);
         const jsonData = await response.json()
         setData(jsonData)
         setIsLoading(false)
@@ -137,7 +140,7 @@ const Home = () => {
     if (!hasExecutedBefore) {
       const fetchData = async () => {
         try {
-          const response = await fetch('http://servicos.multi.com.br:8800/');
+          const response = await fetch(`${host}`);
           if (response.status == 200) setOpenSuccess(true)
         } catch (error) {
           setOpenError(true)
@@ -158,17 +161,6 @@ const Home = () => {
   const handleOs = (os) => {
     navigate(`/os/${os}`)
   }
-
-  const formatarData = (data) => {
-    if (data) {
-      const partes = data.split('-');
-      if (partes.length !== 3) {
-        return 'Data inválida';
-      }
-      const [ano, mes, dia] = partes;
-      return `${dia}/${mes}/${ano}`;
-    }
-  };
 
   return (
     <div>
@@ -194,7 +186,7 @@ const Home = () => {
                     variant="contained"
                     color="success"
                     onClick={() => handleOs(os.idos)}
-                    style={{ fontFamily: 'inherit', fontWeight: '500' }}
+                    style={{ fontFamily: 'inherit', fontWeight: '500', padding: '.4rem 1.6rem' }}
                   >Abrir OS</Button>
                 </CardActions>
               </div>
@@ -205,6 +197,7 @@ const Home = () => {
             <p style={{ fontSize: '22px', color: '#3a3a3a' }}>Não há ordens de serviço ativas</p>
           </div>
         )}
+
         <Snackbar open={openSuccess} >
           <Alert className='alert-success' severity="success" >
             Conexão com o banco de imagens bem sucedida!

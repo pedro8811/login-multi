@@ -10,6 +10,7 @@ import { Snackbar, Alert } from '@mui/material'
 
 const Card = styled.div`
   width: 400px;
+  z-index: 1;
   background: #f0f0f0;
   padding: 25px;
   box-shadow: 1px 2px 8px #929292;
@@ -115,9 +116,7 @@ const CredentialsCard = () => {
         { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } }
       );
 
-      // sessionStorage.setItem('userToken', response.data.sessionToken)
-      // const userId = sessionStorage.getItem('userToken')
-      // // console.log(userId)
+      sessionStorage.setItem('userToken', response.data.sessionToken)
 
       if (data.login == undefined || data.login == '') {
         setMessage('Login falhou!')

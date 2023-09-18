@@ -5,7 +5,7 @@ import MenuItem from '@mui/material/MenuItem';
 import { useState } from 'react';
 import Button from '@mui/material/Button';
 import { useNavigate } from 'react-router-dom';
-import {font} from '../utils/env'
+import { font } from '../utils/env'
 
 const ContainerHeader = styled.nav`
   display: flex;
@@ -35,6 +35,9 @@ const NavLinks = styled.ul`
     margin-right: 30px;
     font-family: ${font}, sans-serif;
     color: #000;
+    #exit-button{
+      font-family: ${font};
+    }
     &:hover{
       background: none;
       text-decoration: underline;
@@ -67,6 +70,8 @@ const Header = () => {
     navigate('/')
   }
 
+  const admin = sessionStorage.getItem('username') == 'Pedroti'
+
   return (
     <ContainerHeader>
       <a onClick={() => navigate('/home')}>
@@ -90,7 +95,13 @@ const Header = () => {
             'aria-labelledby': 'basic-button',
           }}
         >
-          <MenuItem onClick={handleLogout} id="exit-button">Sair</MenuItem>
+          {
+            admin && (
+              <MenuItem style={{ fontFamily: `${font}` }} onClick={() => navigate('/admin')} id="exit-button">Painel de Administrador</MenuItem>
+            )
+          }
+          <MenuItem style={{ fontFamily: `${font}` }} onClick={() => navigate('/home')} id="exit-button">Início</MenuItem>
+          <MenuItem style={{ fontFamily: `${font}` }} onClick={handleLogout} id="exit-button">Sair</MenuItem>
         </Menu>
       </NavLinks>
     </ContainerHeader>

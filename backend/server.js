@@ -3,6 +3,8 @@ const cors = require('cors')
 const mysql = require('mysql')
 const multer = require('multer')
 const util = require('util')
+const fs = require('fs')
+const path = require('path');
 
 const app = express()
 app.use(cors())
@@ -33,7 +35,18 @@ db.connect((err) => {
 })
 
 app.get('/version', (req, res) => {
-  res.send('1.1')
+  res.send('1.3')
+})
+
+app.get('/qtd', (req, res) => {
+  const sql = 'SELECT COUNT(*) FROM multi.images_os'
+  db.query(sql, (err, data) => {
+    if (err) {
+      return res.json('Error: ' + err)
+    } else {
+      return res.send(data[0])
+    }
+  })
 })
 
 app.get('/', (req, res) => {
@@ -42,7 +55,7 @@ app.get('/', (req, res) => {
     if (err) {
       return res.json('Error: ' + err)
     } else {
-      return res.json(data)
+      return res.send(data)
     }
   })
 })
@@ -59,13 +72,43 @@ app.post('/upload', upload.array('OsImage'), async (req, res) => {
       return;
     }
 
+    // Função para criar uma string de 6 dígitos a partir de 'os'
+    function padToSixDigits(number) {
+      const stringifiedNumber = String(number);
+      const numberOfZerosToAdd = 6 - stringifiedNumber.length;
+      if (numberOfZerosToAdd > 0) {
+        return '0'.repeat(numberOfZerosToAdd) + stringifiedNumber;
+      }
+      return stringifiedNumber;
+    }
+
+    const paddedOs = padToSixDigits(os);
+
+    // http://servicos.multi.com.br/fotos/id_os/foto.jpg
+
     let hasError = false;
 
-    for (const base64Image of base64Images) {
+    for (let i = 0; i < base64Images.length; i++) {
+      const base64Image = base64Images[i];
+
       try {
         const sql = 'INSERT INTO multi.images_os (image, idos) VALUES (?, ?)';
         await dbQueryAsync(sql, [base64Image, os]);
-        console.log('Imagem inserida com sucesso no banco de dados');
+
+        const imageName = `foto_${i + 1}.jpg`;
+        const imagePath = path.join(__dirname, 'fotos', String(paddedOs), imageName);
+
+        // Garantir que a pasta exista
+        const folderPath = path.dirname(imagePath);
+        if (!fs.existsSync(folderPath)) {
+          fs.mkdirSync(folderPath, { recursive: true });
+        }
+
+        // Salvar a imagem na pasta do servidor
+        fs.writeFileSync(imagePath, base64Image);
+
+        console.log(`Imagem salva em: ${imagePath}`);
+
       } catch (err) {
         console.error(err);
         hasError = true;

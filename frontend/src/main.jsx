@@ -4,11 +4,10 @@ import { RouterProvider, createBrowserRouter } from 'react-router-dom';
 
 import Home from './pages/Home.jsx'
 import Login from './pages/Login.jsx'
-import Error from './pages/Error404.jsx'
-import AuthError from './pages/AuthError.jsx'
 import OrdemServico from './pages/OrdemServico.jsx'
 
 import './global-style.css'
+import Admin from './pages/Admin.jsx';
 
 const router = createBrowserRouter([
   {
@@ -20,17 +19,13 @@ const router = createBrowserRouter([
     element: <Home />,
   },
   {
+    path: "/admin",
+    element: <Admin />,
+  },
+  {
     path: "/os/:os",
     element: <OrdemServico />
   },
-  {
-    path: "*",
-    element: <Error />
-  },
-  {
-    path: "/auth-error",
-    element: <AuthError />
-  }
 ])
 
 ReactDOM.createRoot(document.getElementById('root')).render(

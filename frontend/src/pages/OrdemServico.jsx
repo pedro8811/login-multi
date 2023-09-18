@@ -17,19 +17,22 @@ import {
 } from '@mui/material'
 import { MdAddPhotoAlternate } from 'react-icons/md'
 import { useState } from 'react'
-import { host, font } from '../utils/env.js'
+import { host, font, formatarData } from '../utils/env.js'
 
+// style modal de imagem
 const style = {
   position: 'absolute',
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: 'auto',
+  maxWidth: '600px',
+  maxHeight: '900px',
   bgcolor: 'background.paper',
   boxShadow: 24,
   p: 4,
 };
 
+// style modal de formulário de finalização
 const styleFinal = {
   position: 'absolute',
   top: '50%',
@@ -41,6 +44,7 @@ const styleFinal = {
   boxShadow: 10,
 };
 
+// style modal de animação do loading
 const styleLoading = {
   position: 'absolute',
   textAlign: 'center',
@@ -58,13 +62,18 @@ const Container = styled.div`
   padding: 45px 100px;
   font-family: ${font};
   section{
-    padding: 15px;
-    background: rgb(255, 255, 255);
+    margin: 40px;
+    padding: 10px 40px;
     border-radius: 5px;
+    box-shadow: 0 0 5px rgba(0,0,0,.5);
+    font-family: ${font};
+    /* padding: 15px; */
+    background: rgb(255, 255, 255);
+    /* border-radius: 5px; */
     border: 1px solid #a7a7a7;
-    -webkit-box-shadow: 0px 0px 10px 1px rgba(0,0,0,0.75);
+    /* -webkit-box-shadow: 0px 0px 10px 1px rgba(0,0,0,0.75);
     -moz-box-shadow: 0px 0px 10px 1px rgba(0,0,0,0.75);
-    box-shadow: 0px 0px 10px 1px rgba(0,0,0,0.75);
+    box-shadow: 0px 0px 10px 1px rgba(0,0,0,0.75); */
     h1{
       font-size: 20px;
     }
@@ -152,6 +161,7 @@ const isValidNumber = (value) => {
 const OrdemServico = () => {
   const { os } = useParams()
   const navigate = useNavigate()
+  const [dadosOs, setDadosOs] = useState({})
   const [data, setData] = useState([])
   const [base64, setBase64] = useState([])
   const [arrayImg, setArrayImg] = useState([])
@@ -160,6 +170,8 @@ const OrdemServico = () => {
   const [openLoading, setOpenLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(true)
   const [openError, setOpenError] = useState(false)
+  const [desc, setDesc] = useState('')
+  const [buttonDisabled, setButtonDisabled] = useState(true);
 
   const [openFinal, setOpenFinal] = useState(false);
   const handleOpenFinal = () => setOpenFinal(true);
@@ -203,6 +215,19 @@ const OrdemServico = () => {
     };
     fetchData();
   }, [os]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await fetch(`https://www.multi.com.br/app/os.php?idos=${os}`)
+        const jsonData = await res.json()
+        setDadosOs(jsonData.ordens[0])
+      } catch (e) {
+        console.error(e)
+      }
+    }
+    fetchData()
+  })
 
   useEffect(() => {
     setArrayImg(data.map(obj => obj.image.data));
@@ -276,6 +301,28 @@ const OrdemServico = () => {
     navigate(`/home`)
   }
 
+  const handleDescChange = (event) => {
+    const newValue = event.target.value
+    setDesc(event.target.value)
+    setButtonDisabled(!newValue.trim());
+  }
+
+  // função de voltar apertando ESC
+  useEffect(() => {
+    const handleKeyPress = (e) => {
+      if (e.key === 'Escape') {
+        handleOs();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+
+    // Remova o ouvinte de evento quando o componente for desmontado
+    return () => {
+      window.removeEventListener('keydown', handleKeyPress);
+    };
+  }, []);
+
   return (
     <div>
       <Header />
@@ -285,13 +332,13 @@ const OrdemServico = () => {
             <div className='infos'>
               <p>Número da os: {os}</p>
               <p>Situação: Ativa</p>
-              <p>Lançamento: </p>
-              <p>Visita: </p>
-              <p>Serviço: </p>
+              <p>Lançamento: {formatarData(dadosOs.dtlancamento)}</p>
+              <p>Visita: {formatarData(dadosOs.dtvisita)}</p>
+              <p>Serviço: {dadosOs.servico}</p>
             </div>
             <div className='buttons'>
               <div>
-                <Tooltip title="Fechar">
+                <Tooltip title="Fechar ou pressione 'ESC'">
                   <IconButton onClick={() => handleOs()}>
                     <GrClose id="icon-close" />
                   </IconButton>
@@ -299,7 +346,7 @@ const OrdemServico = () => {
               </div>
               <form onSubmit={handleSubmit} className='form'>
                 <Tooltip className="label" title="Inserir imagens">
-                  <label htmlFor={`picture__input_${os}`}>
+                  <label htmlFor={`picture__input_${os}`} tabIndex='1'>
                     <MdAddPhotoAlternate id="icon-img" />
                   </label>
                 </Tooltip>
@@ -332,6 +379,7 @@ const OrdemServico = () => {
                 style={{ fontFamily: 'inherit', fontWeight: '500' }}
               >Finalizar</Button>
 
+              {/* modal de finalização de OS */}
               <Modal
                 open={openFinal}
                 onClose={handleCloseFinal}
@@ -342,11 +390,13 @@ const OrdemServico = () => {
                   <Form onSubmit={handleSubmitFinal}>
                     <div className="form-group">
                       <textarea
-                        placeholder='Descrição...'
+                        placeholder='...'
                         className="form-control"
                         id="exampleFormControlTextarea1"
                         rows="7"
                         name='descricao'
+                        onChange={handleDescChange}
+                        value={desc}
                       ></textarea>
                     </div>
                     <div className='d-flex justify-content-end mt-4'>
@@ -362,6 +412,7 @@ const OrdemServico = () => {
                         variant='contained'
                         color="error"
                         style={{ fontFamily: 'inherit' }}
+                        disabled={buttonDisabled}
                       >Finalizar</Button>
                     </div>
                   </Form>
@@ -390,6 +441,8 @@ const OrdemServico = () => {
             </div>
           )}
         </section>
+
+        {/* modal que mostra imagem grande */}
         <Modal
           open={open}
           onClose={handleCloseModal}
@@ -397,10 +450,12 @@ const OrdemServico = () => {
           aria-describedby="modal-modal-description"
         >
           <Box sx={style}>
-            {selectedImage && <img width="100%" src={`data:image/jpeg;base64, ${selectedImage}`} alt="" />}
+            {selectedImage && <img style={{ width: '100%', height: 'auto' }}
+              src={`data:image/jpeg;base64, ${selectedImage}`} alt="" />}
           </Box>
         </Modal>
 
+        {/* pop-up de erro */}
         <Snackbar open={openError} >
           <Alert className='alert-error' severity="error" >
             Nenhuma imagem foi selecionada!
@@ -408,6 +463,8 @@ const OrdemServico = () => {
         </Snackbar>
 
       </Container>
+
+      {/* modal de loading */}
       <Modal
         open={openLoading}
         aria-labelledby="modal-modal-title"
@@ -417,6 +474,7 @@ const OrdemServico = () => {
           <CircularProgress color="inherit" />
         </Box>
       </Modal>
+
     </div>
   )
 }

@@ -9,15 +9,17 @@ const Container = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  background-image: url(${background});
-  background-repeat: no-repeat;
-  background-size: cover;
+  #background{
+    position: fixed;
+    width: auto;
+  }
 `
 
 function Login() {
   sessionStorage.clear()
   return (
     <Container>
+      <img id="background" src={background} alt="background image" />
       <CredentialsCard />
     </Container>
   )
